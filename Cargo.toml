@@ -1,0 +1,15 @@
+[package]
+name = "bls_bench"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
+criterion = { version = "0.4", default-features = false }
+rand = "0.8"
+
+[[bench]]
+name = "verify"
+harness = false
