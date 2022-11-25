@@ -1,5 +1,6 @@
 target/
 build/
 node_modules/
+tmp_output/
 *.ptau
 *.log
