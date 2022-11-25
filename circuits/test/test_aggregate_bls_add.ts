@@ -1,5 +1,8 @@
 import path from "path";
+const fs = require("fs");
+
 import { PointG1 } from "@noble/bls12-381";
+import { fstat } from "fs";
 const circom_tester = require("circom_tester");
 const wasm_tester = circom_tester.wasm;
 
@@ -34,9 +37,13 @@ describe("BLS12-381-AggregateAdd", function () {
   this.timeout(1000 * 1000);
 
   let circuit: any;
+  let options = { include: __dirname, output: "tmp_output" };
+  console.log(__dirname);
+  fs.mkdirSync("tmp_output", { recursive: true });
   before(async function () {
     circuit = await wasm_tester(
-      path.join(__dirname, "circuits", "test_aggregate_bls_add_4.circom")
+      path.join(__dirname, "circuits", "test_aggregate_bls_add_4.circom"),
+      options
     );
   });
 

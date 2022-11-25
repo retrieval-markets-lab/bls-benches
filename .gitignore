@@ -3,3 +3,6 @@ build/
 node_modules/
 *.ptau
 *.log
+circom-pairing/
+circom/
+tmp_output/

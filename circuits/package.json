@@ -6,14 +6,12 @@
   "author": "\"\"",
   "license": "MIT",
   "scripts": {
-    "build:c": "cd ./scripts && ./build.sh",
-    "build:wasm": "cd ./scripts && ./wasm_build.sh",
-    "build:header": "cd ./scripts && ./build_assert_valid_signed_header.sh",
-    "test": "NODE_OPTIONS=--max_old_space_size=56000 mocha -r tsx test/test*.ts",
-    "sample": "tsx scripts/processUpdateFromData.ts"
+    "pairing_setup": "git clone https://github.com/yi-sun/circom-pairing",
+    "build:ceremony": "cd ./scripts && ./01_ceremony_phase1.sh",
+    "build:bls": "cd ./scripts && ./02_build_aggregate_bls_verify.sh",
+    "test": "NODE_OPTIONS=--max_old_space_size=56000 mocha -r tsx test/test*.ts"
   },
   "devDependencies": {
-    "operator": "1.0.0",
     "@chainsafe/bls": "^7.1.1",
     "@chainsafe/lodestar-config": "^0.39.0",
     "@chainsafe/lodestar-types": "^0.34.4",
@@ -24,7 +22,8 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.4",
     "axios": "^0.27.2",
-    "circom_tester": "^0.0.14",
+    "circom_tester": "^0.0.19",
+    "operator": "1.0.0",
     "tsx": ">=3.7.0",
     "typescript": ">=4.5.0"
   },
