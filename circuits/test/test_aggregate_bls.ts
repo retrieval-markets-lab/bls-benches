@@ -1,7 +1,6 @@
 import path from "path";
 const fs = require("fs");
-
-import { PointG1 } from "@noble/bls12-381";
+import { PointG1, PointG2, sign, aggregateSignatures } from "@noble/bls12-381";
 import { fstat } from "fs";
 const circom_tester = require("circom_tester");
 const wasm_tester = circom_tester.wasm;
@@ -24,6 +23,11 @@ function bigint_to_array(n: number, k: number, x: bigint) {
 function point_to_bigint(point: PointG1): [bigint, bigint] {
   let [x, y] = point.toAffine();
   return [x.value, y.value];
+}
+
+function g2_to_bigint(point: PointG2): [[bigint, bigint], [bigint, bigint]] {
+  let [x, y] = point.toAffine();
+  return [[x.c0.value, x.c1.value], [y.c0.value, y.c1.value]];
 }
 
 const private_keys = [
@@ -81,6 +85,7 @@ describe("BLS12-381-AggregateAdd", function () {
       point_to_bigint(sum),
       bitArray,
     ]);
+
   }
 
   var test_bls12381_add_instance = function (
@@ -125,4 +130,111 @@ describe("BLS12-381-AggregateAdd", function () {
   };
 
   test_cases.forEach(test_bls12381_add_instance);
+})
+
+describe("BLS12-381-Verify", async function () {
+  this.timeout(1000 * 1000);
+
+  let circuit: any;
+  let options = { include: __dirname, output: "tmp_output" };
+  console.log(__dirname);
+  fs.mkdirSync("tmp_output", { recursive: true });
+  before(async function () {
+    circuit = await wasm_tester(
+      path.join(__dirname, "circuits", "test_aggregate_bls_verify_4.circom"),
+      options
+    );
+  });
+
+  var test_cases: Array<
+    [
+      [bigint, bigint],
+      [bigint, bigint],
+      [bigint, bigint],
+      [bigint, bigint],
+      number[],
+      [[bigint, bigint], [bigint, bigint]],
+      [[bigint, bigint], [bigint, bigint]],
+    ]
+  > = [];
+
+  const msgp = await PointG2.hashToCurve('09');
+  console.log(msgp);
+
+  const signatures = await Promise.all(private_keys.map(p => sign(msgp, p)));
+
+  for (var test = 1; test < 16; test++) {
+    var bitArray = test
+      .toString(2)
+      .padStart(4, "0")
+      .split("")
+      .map((x) => parseInt(x));
+    var pubkeys: Array<PointG1> = [];
+    var sigs: Array<PointG2> = [];
+    for (var idx = 0; idx < 4; idx++) {
+      let priv = private_keys[idx];
+      var pubkey: PointG1 = PointG1.fromPrivateKey(BigInt(priv));
+      pubkeys.push(pubkey);
+      if (bitArray[idx] == 1) {
+        sigs.push(signatures[idx])
+      }
+    }
+    var agg_sig = aggregateSignatures(sigs);
+
+    test_cases.push([
+      point_to_bigint(pubkeys[0]),
+      point_to_bigint(pubkeys[1]),
+      point_to_bigint(pubkeys[2]),
+      point_to_bigint(pubkeys[3]),
+      bitArray,
+      g2_to_bigint(agg_sig),
+      g2_to_bigint(msgp),
+    ]);
+
+  }
+
+  var test_bls12381_verify = function (
+    test_case: [
+      [bigint, bigint],
+      [bigint, bigint],
+      [bigint, bigint],
+      [bigint, bigint],
+      number[],
+      [[bigint, bigint], [bigint, bigint]],
+      [[bigint, bigint], [bigint, bigint]],
+    ]
+  ) {
+    let [pub0x, pub0y] = test_case[0];
+    let [pub1x, pub1y] = test_case[1];
+    let [pub2x, pub2y] = test_case[2];
+    let [pub3x, pub3y] = test_case[3];
+    let bitArray = test_case[4];
+    let aggregateSig = test_case[5];
+    let messageHash = test_case[6];
+
+    var n: number = 55;
+    var k: number = 7;
+    var pub0x_array: bigint[] = bigint_to_array(n, k, pub0x);
+    var pub0y_array: bigint[] = bigint_to_array(n, k, pub0y);
+    var pub1x_array: bigint[] = bigint_to_array(n, k, pub1x);
+    var pub1y_array: bigint[] = bigint_to_array(n, k, pub1y);
+
+    it(JSON.stringify(bitArray), async function () {
+      let witness = await circuit.calculateWitness({
+        pubkeys: [
+          [pub0x_array, pub0y_array],
+          [pub1x_array, pub1y_array],
+          [bigint_to_array(n, k, pub2x), bigint_to_array(n, k, pub2y)],
+          [bigint_to_array(n, k, pub3x), bigint_to_array(n, k, pub3y)],
+        ],
+        signature: aggregateSig,
+        Hm: messageHash,
+        pubkeybits: bitArray,
+      });
+
+      await circuit.checkConstraints(witness);
+    });
+  };
+
+  test_cases.forEach(test_bls12381_verify);
 });

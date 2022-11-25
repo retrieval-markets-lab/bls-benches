@@ -11,6 +11,7 @@ run() {
     start=`date +%s`
     snarkjs powersoftau new bn128 26 $BUILD_DIR/pot26_0000.ptau -v
     snarkjs powersoftau contribute $BUILD_DIR/pot26_0000.ptau $BUILD_DIR/pot26_0001.ptau --name="First contribution" -v
+    snarkjs powersoftau prepare phase2 $BUILD_DIR/pot26_0001.ptau $BUILD_DIR/pot26_final.ptau -v
     end=`date +%s`
     echo "DONE ($((end-start))s)"
 
