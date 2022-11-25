@@ -26,7 +26,7 @@ wasmer run --enable-simd --dir=. verify-simd.wasm -- --bench
 **MBP M1, 16GB of RAM, average of 100 samples**
 
 
-| n      | native      |  wasm32-wasi | wasm-wasi (+simd) |
+| n      | native      |  wasm32-wasi | wasm32-wasi (+simd) |
 | -----  | ----------- |  ----------- | ----------- |
 | 1      | 2.5076 ms   |  7.5714 ms   | _           |
 | 10     | 3.5403 ms   |  29.414 ms   | _           |

@@ -1,1 +1,5 @@
 /target
+build/
+node_modules/
+*.ptau
+*.log
