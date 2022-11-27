@@ -9,7 +9,7 @@
     "pairing_setup": "git clone https://github.com/yi-sun/circom-pairing",
     "build:ceremony": "cd ./scripts && ./01_ceremony_phase1.sh",
     "build:bls": "cd ./scripts && ./02_build_aggregate_bls_verify.sh",
-    "test": "NODE_OPTIONS=--max_old_space_size=56000 mocha -r tsx test/test*.ts"
+    "test": "mocha -r tsx test/test*.ts"
   },
   "devDependencies": {
     "@chainsafe/bls": "^7.1.1",
