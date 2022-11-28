@@ -2,17 +2,17 @@
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 mod blockstore;
-
 use crate::blockstore::Blockstore;
+use bls_signatures::{
+    verify_messages, PublicKey as BlsPubKey, Serialize, Signature as BlsSignature,
+};
 use cid::multihash::Code;
 use cid::Cid;
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
 use fvm_ipld_encoding::{to_vec, CborStore, RawBytes, DAG_CBOR};
 use fvm_sdk as sdk;
-use fvm_sdk::crypto::verify_signature;
 use fvm_sdk::message::params_raw;
 use fvm_sdk::NO_DATA_BLOCK_ID;
-use fvm_shared::address::Address;
 use fvm_shared::crypto::signature::Signature;
 use fvm_shared::ActorID;
 
@@ -24,6 +24,7 @@ macro_rules! abort {
             Some(format!($msg, $($ex,)*).as_str()),
         )
     };
+
 }
 
 /// The state object.
@@ -35,14 +36,11 @@ pub struct State {
 /// The params object.
 #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
 pub struct VerifyParams {
-    pub signature: Signature,
-    pub address: Address,
-    pub msg: Vec<u8>,
+    pub aggregate_signature: Signature,
+    pub pub_keys: Vec<Vec<u8>>,
+    pub data: Vec<Vec<u8>>,
 }
 
-/// We should probably have a derive macro to mark an object as a state object,
-/// and have load and save methods automatically generated for them as part of a
-/// StateObject trait (i.e. impl StateObject for State).
 impl State {
     pub fn load() -> Self {
         // First, load the current state root.
@@ -116,6 +114,9 @@ pub fn constructor() -> Option<RawBytes> {
     // This constant should be part of the SDK.
     const INIT_ACTOR_ADDR: ActorID = 1;
 
+    // Should add SDK sugar to perform ACL checks more succinctly.
+    // i.e. the equivalent of the validate_* builtin-actors runtime methods.
+    // https://github.com/filecoin-project/builtin-actors/blob/master/actors/runtime/src/runtime/fvm.rs#L110-L146
     if sdk::message::caller() != INIT_ACTOR_ADDR {
         abort!(USR_FORBIDDEN, "constructor invoked by non-init actor");
     }
@@ -131,13 +132,38 @@ pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
     state.count += 1;
     state.save();
 
-    let res = verify_signature(&params.signature, &params.address, &params.msg);
-    let verification = match res {
+    // If the number of public keys and data does not match, then return false
+    if params.data.len() != params.pub_keys.len() {
+        abort!(USR_ILLEGAL_STATE, "pubkeys and data are wrong length");
+    }
+    if params.data.is_empty() {
+        abort!(USR_ILLEGAL_STATE, "data field is empty");
+    }
+
+    let sig = match BlsSignature::from_bytes(params.aggregate_signature.bytes()) {
         Ok(v) => v,
         Err(err) => {
-            abort!(USR_ILLEGAL_STATE, "failed to verify signatures: {:?}", err);
+            abort!(USR_ILLEGAL_STATE, "invalid signature {:?}", err);
         }
     };
+
+    let pk_map_results: Result<Vec<_>, _> = params
+        .pub_keys
+        .iter()
+        .map(|x| BlsPubKey::from_bytes(x))
+        .collect();
+
+    let pks = match pk_map_results {
+        Ok(v) => v,
+        Err(err) => {
+            abort!(USR_ILLEGAL_STATE, "invalid pub key {:?}", err);
+        }
+    };
+
+    let data: Vec<&[u8]> = params.data.iter().map(|x| &**x).collect();
+    // Does the aggregate verification
+
+    let verification = verify_messages(&sig, &data, &pks[..]);
 
     let ret = to_vec(format!("Call #{} ended with {:?}!", &state.count, verification).as_str());
     match ret {
