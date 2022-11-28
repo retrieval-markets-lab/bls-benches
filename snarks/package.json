@@ -1,0 +1,40 @@
+{
+  "name": "circuits",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:retrieval-markets-lab/bls-benches.git",
+  "author": "\"\"",
+  "license": "MIT",
+  "scripts": {
+    "pairing_setup": "git clone https://github.com/yi-sun/circom-pairing",
+    "build:ceremony": "cd ./scripts && ./01_ceremony_phase1.sh",
+    "verify:plonk": "cd ./scripts && ./02_build_aggregate_bls_verify_plonk.sh",
+    "verify:groth16": "cd ./scripts && ./02_build_aggregate_bls_verify_groth16.sh",
+    "test": "mocha -r tsx test/test*.ts"
+  },
+  "devDependencies": {
+    "@chainsafe/bls": "^7.1.1",
+    "@chainsafe/lodestar-config": "^0.39.0",
+    "@chainsafe/lodestar-types": "^0.34.4",
+    "@lodestar/api": "^0.40.0",
+    "@lodestar/light-client": "^0.40.0",
+    "@lodestar/types": "^0.40.0",
+    "@noble/bls12-381": "^1.2.0",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.4",
+    "axios": "^0.27.2",
+    "circom_tester": "^0.0.19",
+    "operator": "1.0.0",
+    "tsx": ">=3.7.0",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@chainsafe/blst": "^0.2.4",
+    "@types/chai": "^4.3.1",
+    "@types/expect": "^24.3.0",
+    "circomlib": "^2.0.5",
+    "mocha": "^10.0.0",
+    "snarkjs": "^0.4.22",
+    "ts-node": "^10.9.1"
+  }
+}

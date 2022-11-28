@@ -1,36 +1,13 @@
-# BLS Benches
+# bls-benches
+A set of experiments for testing out methods for aggregate BLS-verification . The main purpose of this repository is to create aset of standardized benchmarks that can be used to inform the [Quarry](https://github.com/retrieval-markets-lab/das-quarry) protocol architecture.
 
-To run benchmarks natively: 
-```bash
-cargo bench verify
+Each sub-folder contains it's own readme with additional details. 
+
+
 ```
-To run in wasm install [wasmer](https://wasmer.io/).
-Then: 
-```bash
-rustup target add wasm32-wasi
-cargo install cargo-wasi
-cargo wasi build --bench=verify --release
-cp `ls -t target/wasm32-wasi/release/deps/*.wasm | head -n 1` verify.wasm
-wasmer run --dir=. verify.wasm -- --bench
+bls-benches/
+├── snarks/ (experiments using circom ZK-SNARKS)
+└── wasm/ (experiments using using wasm)
+└── circuits/ (pending: experiements using Filecoin native actors)
 ```
-
-To run in wasm with SIMD enabled, run the same steps as above but add the following `RUSTFLAGS` assignment to the build phase: 
-```bash
-RUSTFLAGS="-C target-feature=+simd128" cargo wasi build --bench=verify --release
-cp `ls -t target/wasm32-wasi/release/deps/*.wasm | head -n 1` verify-simd.wasm
-wasmer run --enable-simd --dir=. verify-simd.wasm -- --bench
-```
-
-## Current Results 
-
-**MBP M1, 16GB of RAM, average of 100 samples**
-
-
-| n      | native      |  wasm32-wasi | wasm-wasi (+simd) |
-| -----  | ----------- |  ----------- | ----------- |
-| 1      | 2.5076 ms   |  7.5714 ms   | _           |
-| 10     | 3.5403 ms   |  29.414 ms   | _           |
-| 100    | 33.718 ms   |  264.15 ms   | _           |
-| 512    | 342.65 ms   |  1684.4 ms   | _           |
-| 1000   | 657.69 ms   |  4065.2 ms   | _           |
 
