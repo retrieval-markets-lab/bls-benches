@@ -7,7 +7,7 @@ Each sub-folder contains it's own readme with additional details.
 ```
 bls-benches/
 ├── snarks/ (experiments using circom ZK-SNARKS)
-└── wasm/ (experiments using using wasm)
-└── circuits/ (pending: experiements using Filecoin native actors)
+└── wasm/ (experiments using wasm)
+└── contracts/ (experiments using Filecoin native actors)
 ```
 

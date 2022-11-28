@@ -82,9 +82,9 @@ pub fn invoke(sig: u32) -> u32 {
     let ret: Option<RawBytes> = match sdk::message::method_number() {
         1 => constructor(),
         2 => {
-            // let sig = params_raw(sig).unwrap().1;
-            // let sig = RawBytes::new(sig).deserialize().unwrap();
-            verify_sig()
+            let sig = params_raw(sig).unwrap().1;
+            let sig = RawBytes::new(sig);
+            verify_sig(sig)
         }
         _ => abort!(USR_UNHANDLED_MESSAGE, "unrecognized method"),
     };
@@ -122,13 +122,13 @@ pub fn constructor() -> Option<RawBytes> {
 
 /// Method num 2.
 pub fn verify_sig(
-    // signature_bytes: RawBytes,
+    signature_bytes: RawBytes,
 ) -> Option<RawBytes> {
     let mut state = State::load();
     state.count += 1;
     state.save();
 
-    // let sig = Signature::new_bls(signature_bytes.to_vec());
+    let sig = Signature::new_bls(signature_bytes.to_vec());
 
     // let addr = match Address::from_bytes(&signer_bytes) {
     //     Ok(s) => s,
@@ -145,7 +145,7 @@ pub fn verify_sig(
     //     }
     // };
 
-    let ret = to_vec(format!("Call #{} ended with !", &state.count).as_str());
+    let ret = to_vec(format!("Call #{} ended with {:?}!", &state.count, sig).as_str());
     match ret {
         Ok(ret) => Some(RawBytes::new(ret)),
         Err(err) => {
