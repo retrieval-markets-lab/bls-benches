@@ -8,7 +8,8 @@
   "scripts": {
     "pairing_setup": "git clone https://github.com/yi-sun/circom-pairing",
     "build:ceremony": "cd ./scripts && ./01_ceremony_phase1.sh",
-    "build:bls": "cd ./scripts && ./02_build_aggregate_bls_verify.sh",
+    "verify:plonk": "cd ./scripts && ./02_build_aggregate_bls_verify_plonk.sh",
+    "verify:groth16": "cd ./scripts && ./02_build_aggregate_bls_verify_groth16.sh",
     "test": "mocha -r tsx test/test*.ts"
   },
   "devDependencies": {

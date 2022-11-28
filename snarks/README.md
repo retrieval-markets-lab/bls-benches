@@ -12,6 +12,29 @@ To install other dependencies run:
 npm install 
 ```
 
+Run 
+
+```bash
+npm test 
+```
+
+
+
+## Current proving time results
+
+**M1Ultra, 64GB of RAM, average of 100 samples**
+
+
+| n      | BLS12-381-AggregateAdd      |  BLS12-381-Verify (plonk) | BLS12-381-Verify (groth16)
+| -----  | -----------                 |  -----------              |  ----------- |
+| 1      | 0 ms                        |  _                        |  _           | 
+| 4      | 1067ms ms                   |  _                        |  _           |
+| 512    | _ ms                        |  _                        |  _           |
+
+## Current verification time results
+
+TODO
+
 
 ## NOTES: 
 

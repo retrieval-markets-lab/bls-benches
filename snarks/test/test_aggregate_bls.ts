@@ -43,7 +43,7 @@ describe("BLS12-381-AggregateAdd", function () {
   this.timeout(1000 * 1000);
 
   let circuit: any;
-  let options = { include: __dirname, output: "tmp_output" };
+  let options = { include: __dirname, output: "tmp_output", verbose: true };
   console.log(__dirname);
   fs.mkdirSync("tmp_output", { recursive: true });
   before(async function () {
@@ -139,7 +139,7 @@ describe("BLS12-381-Verify", function () {
   this.timeout(1000000 * 1000);
 
   let circuit: any;
-  let options = { include: __dirname, output: "tmp_output" };
+  let options = { include: __dirname, output: "tmp_output", verbose: true };
   console.log(__dirname);
 
   const msgp = new PointG2(

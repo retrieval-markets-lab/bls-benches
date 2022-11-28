@@ -4,7 +4,7 @@ CIRCUIT_NAME=test_aggregate_bls_verify_512
 INPUT_NAME=input_aggregate_bls_verify_512
 TEST_DIR=../test
 OUTPUT_DIR="$BUILD_DIR"/"$CIRCUIT_NAME"_js
-PHASE1=$BUILD_DIR/pot12_0000.ptau
+PHASE1=$BUILD_DIR/pot26_final.ptau
 
 
 run() {
