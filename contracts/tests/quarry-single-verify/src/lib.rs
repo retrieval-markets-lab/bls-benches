@@ -33,6 +33,14 @@ pub struct State {
     pub count: u64,
 }
 
+/// The state object.
+#[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
+pub struct VerifyParams {
+    pub signature: Signature,
+    pub address: Address,
+    pub msg: Vec<u8>,
+}
+
 /// We should probably have a derive macro to mark an object as a state object,
 /// and have load and save methods automatically generated for them as part of a
 /// StateObject trait (i.e. impl StateObject for State).
@@ -77,14 +85,19 @@ impl State {
 /// Put all methods inside an impl struct and annotate it with a derive macro
 /// that handles state serde and dispatch.
 #[no_mangle]
-pub fn invoke(sig: u32) -> u32 {
+pub fn invoke(params: u32) -> u32 {
     // Conduct method dispatch. Handle input parameters and return data.
     let ret: Option<RawBytes> = match sdk::message::method_number() {
         1 => constructor(),
         2 => {
-            let sig = params_raw(sig).unwrap().1;
-            let sig = RawBytes::new(sig);
-            verify_sig(sig)
+            let params = params_raw(params).unwrap().1;
+            let params = match RawBytes::new(params).deserialize() {
+                Ok(p) => p,
+                Err(err) => {
+                    abort!(USR_SERIALIZATION, "failed to deserialize params: {}", err);
+                }
+            };
+            verify_sig(params)
         }
         _ => abort!(USR_UNHANDLED_MESSAGE, "unrecognized method"),
     };
@@ -121,31 +134,20 @@ pub fn constructor() -> Option<RawBytes> {
 }
 
 /// Method num 2.
-pub fn verify_sig(
-    signature_bytes: RawBytes,
-) -> Option<RawBytes> {
+pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
     let mut state = State::load();
     state.count += 1;
     state.save();
 
-    let sig = Signature::new_bls(signature_bytes.to_vec());
+    let res = verify_signature(&params.signature, &params.address, &params.msg);
+    let verification = match res {
+        Ok(v) => v,
+        Err(err) => {
+            abort!(USR_ILLEGAL_STATE, "failed to verify signatures: {:?}", err);
+        }
+    };
 
-    // let addr = match Address::from_bytes(&signer_bytes) {
-    //     Ok(s) => s,
-    //     Err(err) => {
-    //         abort!(USR_ILLEGAL_STATE, "invalid signer address: {:?}", err);
-    //     }
-    // };
-
-    // let res = verify_signature(&sig, &addr, &plaintext);
-    // let verification = match res {
-    //     Ok(v) => v,
-    //     Err(err) => {
-    //         abort!(USR_ILLEGAL_STATE, "failed to verify signatures: {:?}", err);
-    //     }
-    // };
-
-    let ret = to_vec(format!("Call #{} ended with {:?}!", &state.count, sig).as_str());
+    let ret = to_vec(format!("Call #{} ended with {:?}!", &state.count, verification).as_str());
     match ret {
         Ok(ret) => Some(RawBytes::new(ret)),
         Err(err) => {
