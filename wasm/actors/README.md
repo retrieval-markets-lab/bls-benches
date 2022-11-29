@@ -3,11 +3,12 @@
 We implement 3 custom actors here. 
 
 ```
-bls-benches/
 ├── actors/ 
     └── agg-multi-verify/ (aggregate signature verification with non-duplicate messages)
     └── agg-single-verify/ (aggregate signature verification with a single shared message)
     └── single-verify/ (single signature verification)
+    └── utils/ (testing and benchmarking utilities)
+    └── benches/ (actor benchmarks)
    
 ```
 
