@@ -3,6 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 mod blockstore;
 use crate::blockstore::Blockstore;
+use bls_wasm_unsafe::{aggregate_bls_verify, g1_from_slice, g2_from_slice};
 use cid::multihash::Code;
 use cid::Cid;
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
@@ -12,7 +13,6 @@ use fvm_sdk::message::params_raw;
 use fvm_sdk::NO_DATA_BLOCK_ID;
 use fvm_shared::crypto::signature::Signature;
 use fvm_shared::ActorID;
-use bls_wasm::unsafe_verification::{g1_from_slice, g2_from_slice, aggregate_bls_verify};
 
 /// A macro to abort concisely.
 macro_rules! abort {
@@ -138,11 +138,8 @@ pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
         }
     };
 
-    let pk_map_results: Result<Vec<_>, _> = params
-        .pub_keys
-        .iter()
-        .map(|x| g1_from_slice(x))
-        .collect();
+    let pk_map_results: Result<Vec<_>, _> =
+        params.pub_keys.iter().map(|x| g1_from_slice(x)).collect();
 
     let pks = match pk_map_results {
         Ok(v) => v,

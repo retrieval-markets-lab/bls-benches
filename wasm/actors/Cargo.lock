@@ -49,6 +49,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anes"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b46cbb362ab8752921c97e041f5e366ee6297bd428a31275b9fcf1e380f7299"
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -265,14 +271,14 @@ dependencies = [
  "digest 0.9.0",
  "ec-gpu",
  "ec-gpu-gen",
- "ff 0.12.1",
- "group 0.12.1",
+ "ff",
+ "group",
  "itertools 0.10.5",
  "lazy_static",
  "log",
  "memmap",
  "num_cpus",
- "pairing 0.22.0",
+ "pairing",
  "rand",
  "rand_core",
  "rayon",
@@ -417,9 +423,9 @@ checksum = "7a6567c1a0c5578465c7d0d543d615a9fa05319556fa14e20d874e3ed4885bdd"
 dependencies = [
  "blst",
  "blstrs",
- "ff 0.12.1",
- "group 0.12.1",
- "pairing 0.22.0",
+ "ff",
+ "group",
+ "pairing",
  "rand_core",
  "subtle",
  "thiserror",
@@ -431,29 +437,15 @@ version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9fcead733e20b9afbf3784a3f33cc6d728e0f11a593a35bd6c5c4503db19e06e"
 dependencies = [
- "bls12_381 0.7.0",
- "ff 0.12.1",
- "group 0.12.1",
+ "bls12_381",
+ "ff",
+ "group",
  "hkdf",
- "pairing 0.22.0",
+ "pairing",
  "rand_core",
  "sha2 0.9.9",
  "subtle",
  "thiserror",
-]
-
-[[package]]
-name = "bls12_381"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d28daeeded7949f1c7c72693377c98473b00be0aa0023760a84a300e4e7c74b"
-dependencies = [
- "digest 0.9.0",
- "ff 0.11.1",
- "group 0.11.0",
- "pairing 0.21.0",
- "rand_core",
- "subtle",
 ]
 
 [[package]]
@@ -463,9 +455,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "62250ece575fa9b22068b3a8d59586f01d426dd7785522efd97632959e71c986"
 dependencies = [
  "digest 0.9.0",
- "ff 0.12.1",
- "group 0.12.1",
- "pairing 0.22.0",
+ "ff",
+ "group",
+ "pairing",
  "rand_core",
  "subtle",
 ]
@@ -474,10 +466,16 @@ dependencies = [
 name = "bls_wasm"
 version = "0.1.0"
 dependencies = [
- "bls12_381 0.6.0",
- "pairing 0.21.0",
+ "bls-signatures 0.13.0",
+ "bls12_381",
+ "criterion",
+ "hkdf",
+ "pairing",
+ "rand",
+ "rand_core",
  "sha2 0.9.9",
  "thiserror",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -502,9 +500,9 @@ dependencies = [
  "blst",
  "byte-slice-cast",
  "ec-gpu",
- "ff 0.12.1",
- "group 0.12.1",
- "pairing 0.22.0",
+ "ff",
+ "group",
+ "pairing",
  "rand_core",
  "serde",
  "subtle",
@@ -575,6 +573,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "cast"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
+
+[[package]]
 name = "cbc"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -606,6 +610,33 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "ciborium"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0c137568cc60b904a7724001b35ce2630fd00d5d84805fbb608ab89509d788f"
+dependencies = [
+ "ciborium-io",
+ "ciborium-ll",
+ "serde",
+]
+
+[[package]]
+name = "ciborium-io"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "346de753af073cc87b52b2083a506b38ac176a44cfb05497b622e27be899b369"
+
+[[package]]
+name = "ciborium-ll"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "213030a2b5a4e0c0892b6652260cf6ccac84827b83a85a534e178e3906c4cf1b"
+dependencies = [
+ "ciborium-io",
+ "half",
+]
 
 [[package]]
 name = "cid"
@@ -966,6 +997,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "criterion"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7c76e09c1aae2bc52b3d2f29e13c6572553b30c4aa1b8a49fd70de6412654cb"
+dependencies = [
+ "anes",
+ "atty",
+ "cast",
+ "ciborium",
+ "clap",
+ "criterion-plot",
+ "itertools 0.10.5",
+ "lazy_static",
+ "num-traits",
+ "oorandom",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tinytemplate",
+ "walkdir",
+]
+
+[[package]]
+name = "criterion-plot"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
+dependencies = [
+ "cast",
+ "itertools 0.10.5",
+]
+
+[[package]]
 name = "crossbeam"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1266,13 +1331,13 @@ dependencies = [
  "crossbeam-channel",
  "ec-gpu",
  "execute",
- "ff 0.12.1",
- "group 0.12.1",
+ "ff",
+ "group",
  "hex",
  "log",
  "num_cpus",
  "once_cell",
- "pairing 0.22.0",
+ "pairing",
  "rayon",
  "sha2 0.10.6",
  "temp-env",
@@ -1391,17 +1456,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c4c9e43643f5a3be4ca5b67d26b98031ff9db6806c3440ae32e02e3ceac3f1b"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "ff"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "131655483be284720a17d74ff97592b8e76576dc25563148601df2d7c9080924"
-dependencies = [
- "bitvec 0.22.3",
- "rand_core",
- "subtle",
 ]
 
 [[package]]
@@ -1776,7 +1830,7 @@ dependencies = [
  "anyhow",
  "bellperson",
  "blstrs",
- "ff 0.12.1",
+ "ff",
  "generic-array",
  "hex",
  "lazy_static",
@@ -1882,7 +1936,7 @@ dependencies = [
  "blstrs",
  "byte-slice-cast",
  "byteorder",
- "ff 0.12.1",
+ "ff",
  "thiserror",
 ]
 
@@ -2514,7 +2568,6 @@ dependencies = [
  "serde",
  "serde_repr",
  "serde_tuple",
- "sha3",
  "thiserror",
  "unsigned-varint",
 ]
@@ -2580,28 +2633,22 @@ dependencies = [
 
 [[package]]
 name = "group"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc5ac374b108929de78460075f3dc439fa66df9d8fc77e8f12caa5165fcf0c89"
-dependencies = [
- "byteorder",
- "ff 0.11.1",
- "rand_core",
- "subtle",
-]
-
-[[package]]
-name = "group"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5dfbfb3a6cfbd390d5c9564ab283a0349b9b9fcd46a706c1eb10e0db70bfbac7"
 dependencies = [
- "ff 0.12.1",
+ "ff",
  "rand",
  "rand_core",
  "rand_xorshift",
  "subtle",
 ]
+
+[[package]]
+name = "half"
+version = "1.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eabb4a44450da02c90444cf74558da904edde8fb4e9035a9a6a4e15445af0bd7"
 
 [[package]]
 name = "hashbrown"
@@ -3153,7 +3200,7 @@ dependencies = [
  "blstrs",
  "byteorder",
  "execute",
- "ff 0.12.1",
+ "ff",
  "generic-array",
  "hex",
  "itertools 0.8.2",
@@ -3254,6 +3301,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86f0b0d4bf799edbc74508c1e8bf170ff5f41238e5f8225603ca7caaae2b7860"
 
 [[package]]
+name = "oorandom"
+version = "11.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ab1bc2a289d34bd04a330323ac98a1b4bc82c9d9fcb1e66b63caa84da26b575"
+
+[[package]]
 name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3276,20 +3329,11 @@ dependencies = [
 
 [[package]]
 name = "pairing"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2e415e349a3006dd7d9482cdab1c980a845bed1377777d768cb693a44540b42"
-dependencies = [
- "group 0.11.0",
-]
-
-[[package]]
-name = "pairing"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "135590d8bdba2b31346f9cd1fb2a912329f5135e832a4f422942eb6ead8b6b3b"
 dependencies = [
- "group 0.12.1",
+ "group",
 ]
 
 [[package]]
@@ -3311,8 +3355,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5cc65faf8e7313b4b1fbaa9f7ca917a0eed499a9663be71477f87993604341d8"
 dependencies = [
  "blake2b_simd",
- "ff 0.12.1",
- "group 0.12.1",
+ "ff",
+ "group",
  "lazy_static",
  "rand",
  "static_assertions",
@@ -3507,8 +3551,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bls-signatures 0.13.0",
+ "bls_wasm",
  "cid",
  "colog",
+ "criterion",
  "fil_builtin_actors_bundle",
  "futures",
  "fvm",
@@ -4083,7 +4129,7 @@ dependencies = [
  "byteorder",
  "cbc",
  "config",
- "ff 0.12.1",
+ "ff",
  "filecoin-hashers",
  "fr32",
  "fs2",
@@ -4118,7 +4164,7 @@ dependencies = [
  "byteorder",
  "crossbeam",
  "fdlimit",
- "ff 0.12.1",
+ "ff",
  "filecoin-hashers",
  "fr32",
  "generic-array",
@@ -4153,7 +4199,7 @@ dependencies = [
  "blake2b_simd",
  "blstrs",
  "byteorder",
- "ff 0.12.1",
+ "ff",
  "filecoin-hashers",
  "fr32",
  "generic-array",
@@ -4174,7 +4220,7 @@ dependencies = [
  "anyhow",
  "bellperson",
  "blstrs",
- "ff 0.12.1",
+ "ff",
  "filecoin-hashers",
  "fr32",
  "generic-array",
@@ -4353,6 +4399,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
 dependencies = [
  "num_cpus",
+]
+
+[[package]]
+name = "tinytemplate"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be4d6b5f19ff7664e8c98d03e2139cb510db9b0a60b55f8e8709b689d939b6bc"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

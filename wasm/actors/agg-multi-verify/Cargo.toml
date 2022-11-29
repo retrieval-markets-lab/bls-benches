@@ -20,8 +20,3 @@ serde_tuple = "0.5"
 [build-dependencies]
 wasm-builder = "3.0.1"
 wasmtime = "0.35.2"
-
-[patch.crates-io]
-# temporary solution to funty@1.2.0 being yanked, we should propose bitvec upgrade to upstream filecoin crates
-# tracking issue: https://github.com/bitvecto-rs/funty/issues/7
-funty = { git = "https://github.com/bitvecto-rs/funty/", rev = "7ef0d890fbcd8b3def1635ac1a877fc298488446" }

@@ -1,0 +1,27 @@
+[package]
+name = "bls_utils"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
+bls12_381 = { version = "=0.7.0", features = ["experimental"] }
+criterion = { version = "0.4", default-features = false  }
+rand = { version = "0.8" }
+wasm-bindgen = { version = "0.2.83"  } 
+sha2 = { version = "0.9"  }
+pairing_lib = { version = "0.22.0", package = "pairing" }
+rand_core = { version = "0.6.0" }
+hkdf = { version = "0.11.0" }
+bls_wasm_unsafe = { path = "../bls-unsafe"}
+
+
+[[bench]]
+name = "verify"
+harness = false
+
+[[bench]]
+name = "verify_unsafe"
+harness = false

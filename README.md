@@ -7,7 +7,15 @@ Each sub-folder contains it's own readme with additional details.
 ```
 bls-benches/
 ├── snarks/ (experiments using circom ZK-SNARKS)
-└── wasm/ (experiments using wasm)
-└── contracts/ (experiments using Filecoin native actors)
+    └── circuits/ (Circom circuits for bls verification)
+    └── scripts/ (scripts for constructing full circuits using Groth16 and PLONK)
+    └── tests/ (tests of circuit functions)
+└── wasm/ (experiments for BLS verification in wasm)
+    └── actors/ (custom Filecoin actors for bls verification)
+         └── tests/ (tests of custom actors within FVM)
+    └── bls/ (library and benchmarks for running bls in wasm)
+        └── benches/ (library benchmarks and tests)
+        └── src/ (bls related functions)
+   
 ```
 

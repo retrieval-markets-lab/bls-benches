@@ -1,10 +1,11 @@
-use bls_wasm::unsafe_verification::{aggregate_bls_verify, make_sig_unsafe};
+use bls_utils::make_sig_unsafe;
+use bls_wasm_unsafe::aggregate_bls_verify;
 use criterion::{criterion_group, criterion_main, Criterion};
 
 macro_rules! bench_verify {
     ($name:ident, $num:expr) => {
         fn $name(c: &mut Criterion) {
-            let (aggregated_signature, message, public_keys) = make_sig_unsafe($num);
+            let (aggregated_signature, message, public_keys) = make_sig_unsafe($num, 64);
             c.bench_function(&format!("verify_unsafe {}", $num), |b| {
                 b.iter(|| aggregate_bls_verify(&aggregated_signature, &message, &public_keys))
             });

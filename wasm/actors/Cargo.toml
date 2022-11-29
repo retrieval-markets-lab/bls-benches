@@ -1,5 +1,5 @@
 [package]
-name = "quarry_integration_tests"
+name = "quarry_actors"
 description = "quarry integration tests with the FVM"
 version = "0.1.0"
 edition = "2021"
@@ -11,6 +11,7 @@ fvm_shared = { version = "3.0.0-alpha.12", git = "https://github.com/filecoin-pr
 fvm_ipld_blockstore = { version = "0.1.1", git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_integration_tests = { version = "0.1.1-alpha.1", git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_ipld_encoding = { version = "0.3.0", git = "https://github.com/filecoin-project/ref-fvm" }
+bls_utils = { package="bls_utils", path = "../bls-utils" } 
 
 
 anyhow = "1.0.47"
@@ -34,20 +35,29 @@ features = ["cranelift", "parallel-compilation"]
 
 [dev-dependencies]
 wat = "1.0.51"
+criterion = { version = "0.4", default-features = false }
 serde = { version = "1.0", features = ["derive"] }
 actors-v10 = { package = "fil_builtin_actors_bundle", git = "https://github.com/filecoin-project/builtin-actors", branch = "next", features = ["m2-native"] }
-quarry-single-verify = { path = "tests/quarry-single-verify" }
-quarry-multi-verify = { path = "tests/quarry-multi-verify" }
-quarry-agg-single-verify = { path = "tests/quarry-agg-single-verify" }
+quarry-single-verify = { path = "single-verify" }
+quarry-multi-verify = { path = "agg-multi-verify" }
+actor_utils = { path = "utils" }
+quarry-agg-single-verify = { path = "agg-single-verify" }
 log = { version = "0.4.17" }
 colog = { version = "1.1.0" }
+pairing_lib = { version = "0.22.0", package = "pairing" }
+
 
 [features]
 default = ["fvm/testing", "fvm_shared/testing"]
-m2-native = []
-f4-as-account = ["fvm/f4-as-account"]
 
-[patch.crates-io]
-# temporary solution to funty@1.2.0 being yanked, we should propose bitvec upgrade to upstream filecoin crates
-# tracking issue: https://github.com/bitvecto-rs/funty/issues/7
-funty = { git = "https://github.com/bitvecto-rs/funty/", rev = "7ef0d890fbcd8b3def1635ac1a877fc298488446" }
+
+
+
+[[bench]]
+name = "dummy"
+harness = false
+
+
+[[bench]]
+name = "agg_multi_verify"
+harness = false

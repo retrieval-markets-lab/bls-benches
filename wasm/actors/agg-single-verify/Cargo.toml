@@ -1,27 +1,22 @@
 [package]
-name = "quarry-single-verify"
-description = "verifies as single bls signature"
+name = "quarry-agg-single-verify"
+description = "verifies an aggregate bls signature against a single message"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 cid = { version = "0.8.5", default-features = false }
 multihash = { version = "0.16.1", default-features = false }
-fvm_sdk = { version = "3.0.0-alpha.12",  git = "https://github.com/filecoin-project/ref-fvm" }
+fvm_sdk = { version = "3.0.0-alpha.12",  git = "https://github.com/filecoin-project/ref-fvm"}
 fvm_shared = { version = "3.0.0-alpha.12",  git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_ipld_blockstore = { version = "0.1.1",  git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_ipld_encoding = { version = "0.3.0",  git = "https://github.com/filecoin-project/ref-fvm" }
 anyhow = "1.0.47"
 serde = { version = "1.0", features = ["derive"] }
 serde_tuple = "0.5"
-
-
+bls_wasm_unsafe = { path = "../../bls-unsafe" }
 
 [build-dependencies]
 wasm-builder = "3.0.1"
 wasmtime = "0.35.2"
 
-[patch.crates-io]
-# temporary solution to funty@1.2.0 being yanked, we should propose bitvec upgrade to upstream filecoin crates
-# tracking issue: https://github.com/bitvecto-rs/funty/issues/7
-funty = { git = "https://github.com/bitvecto-rs/funty/", rev = "7ef0d890fbcd8b3def1635ac1a877fc298488446" }

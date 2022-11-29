@@ -1,11 +1,11 @@
-use bls_wasm::{make_sig};
 use bls_signatures::*;
+use bls_utils::make_sig_safe;
 use criterion::{criterion_group, criterion_main, Criterion};
 
 macro_rules! bench_verify {
     ($name:ident, $num:expr) => {
         fn $name(c: &mut Criterion) {
-            let (aggregated_signature, hashes, public_keys) = make_sig($num);
+            let (aggregated_signature, hashes, public_keys, _) = make_sig_safe($num, 64);
             c.bench_function(&format!("verify {}", $num), |b| {
                 b.iter(|| verify(&aggregated_signature, &hashes, &public_keys))
             });
