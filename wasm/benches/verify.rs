@@ -1,4 +1,4 @@
-use bls_bench::*;
+use bls_wasm::{make_sig};
 use bls_signatures::*;
 use criterion::{criterion_group, criterion_main, Criterion};
 

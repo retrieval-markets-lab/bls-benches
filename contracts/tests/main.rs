@@ -15,6 +15,8 @@ use fvm_shared::state::StateTreeVersion;
 use fvm_shared::version::NetworkVersion;
 use log::info;
 use num_traits::Zero;
+use quarry_agg_single_verify::VerifyParams as MultiSingleMSgVerifyParams;
+use quarry_agg_single_verify::WASM_BINARY as MULTI_SINGLE_MSG_VERIFY_BIN;
 use quarry_multi_verify::VerifyParams as MultiVerifyParams;
 use quarry_multi_verify::WASM_BINARY as MULTI_VERIFY_BIN;
 use quarry_single_verify::VerifyParams;
@@ -293,6 +295,118 @@ pub fn aggregate_verify() {
         aggregate_signature: calculated_bls_agg,
         pub_keys: public_keys,
         data: data.iter().map(|d| d.to_vec()).collect(),
+    };
+
+    let raw_bytes = match RawBytes::serialize(params) {
+        Ok(b) => b,
+        Err(err) => {
+            panic!("failed to serialize params {:?}", err);
+        }
+    };
+    // Send message
+    let message = Message {
+        from: sender[0].1,
+        to: actor_address,
+        gas_limit: 1000000000000000,
+        method_num: 2,
+        sequence: 1,
+        params: raw_bytes,
+        ..Message::default()
+    };
+
+    let res = executor.execute_message(message, ApplyKind::Explicit, 100);
+
+    assert!(res.is_ok());
+
+    let res = res.unwrap();
+    info!(
+        "Return data: {:?} | Gas used {:?} | Gas burned {:?}",
+        res.msg_receipt.return_data.deserialize::<String>().unwrap(),
+        res.msg_receipt.gas_used,
+        res.gas_burned
+    );
+}
+
+#[test]
+pub fn aggregate_verify_single_msg() {
+    setup();
+
+    #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
+    struct State {
+        count: usize,
+    }
+
+    // Instantiate tester
+    let bs = MemoryBlockstore::default();
+    let bundle_root = bundle::import_bundle(&bs, actors_v10::BUNDLE_CAR).unwrap();
+    let mut tester =
+        Tester::new(NetworkVersion::V18, StateTreeVersion::V5, bundle_root, bs).unwrap();
+
+    // The number of signatures in aggregate
+    const NUM_SIGS: usize = 10;
+    info!("Using {} signatures", NUM_SIGS);
+
+    // we retain this so its roughly like for like in terms of (total) message size
+    const MESSAGE_LEN: usize = NUM_SIGS * 64;
+    info!("Using a message of length {}", MESSAGE_LEN);
+
+    let rng = &mut ChaCha8Rng::seed_from_u64(11);
+    let data = &mut [0 as u8; MESSAGE_LEN];
+    rng.fill_bytes(data);
+    info!("Message [{:?}, {:?} ...]", data[0], data[1]);
+
+    let private_keys: Vec<PrivateKey> = (0..NUM_SIGS).map(|_| PrivateKey::generate(rng)).collect();
+    let public_keys: Vec<_> = private_keys
+        .iter()
+        .map(|x| x.public_key().as_bytes())
+        .collect();
+
+    let signatures: Vec<BlsSignature> = (0..NUM_SIGS).map(|x| private_keys[x].sign(data.clone())).collect();
+    info!("Signed message");
+
+    let calculated_bls_agg =
+        Signature::new_bls(bls_signatures::aggregate(&signatures).unwrap().as_bytes());
+
+    info!("Aggregated signatures");
+
+    let sender: [Account; 1] = tester.create_accounts().unwrap();
+
+    // Get wasm bin
+    let wasm_bin = MULTI_SINGLE_MSG_VERIFY_BIN.unwrap();
+
+    // Set actor state
+    let actor_state = State { count: 0 };
+    let state_cid = tester.set_state(&actor_state).unwrap();
+
+    // Set actor
+    let actor_address = Address::new_id(10000);
+
+    tester
+        .set_actor_from_bin(&wasm_bin, state_cid, actor_address, TokenAmount::zero())
+        .unwrap();
+
+    // Instantiate machine
+    tester.instantiate_machine(DummyExterns).unwrap();
+    let mut executor = tester.executor.unwrap();
+
+    // Send message
+    let message = Message {
+        from: sender[0].1,
+        to: actor_address,
+        gas_limit: 1000000000,
+        method_num: 1,
+        sequence: 0,
+        ..Message::default()
+    };
+
+    let res = executor.execute_message(message, ApplyKind::Explicit, 100);
+
+    assert!(res.is_ok());
+
+    let params = MultiSingleMSgVerifyParams {
+        aggregate_signature: calculated_bls_agg,
+        pub_keys: public_keys,
+        data: data.to_vec(),
     };
 
     let raw_bytes = match RawBytes::serialize(params) {

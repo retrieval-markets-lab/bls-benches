@@ -5,11 +5,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
 fvm = { version = "3.0.0-alpha.11", git = "https://github.com/filecoin-project/ref-fvm", default-features = false }
 fvm_shared = { version = "3.0.0-alpha.12", git = "https://github.com/filecoin-project/ref-fvm", features = ["crypto"] }
 fvm_ipld_blockstore = { version = "0.1.1", git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_integration_tests = { version = "0.1.1-alpha.1", git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_ipld_encoding = { version = "0.3.0", git = "https://github.com/filecoin-project/ref-fvm" }
+
 
 anyhow = "1.0.47"
 cid = { version = "0.8.5", default-features = false }
@@ -33,10 +35,10 @@ features = ["cranelift", "parallel-compilation"]
 [dev-dependencies]
 wat = "1.0.51"
 serde = { version = "1.0", features = ["derive"] }
-bls-signatures = { version = "0.12", default-features = false }
 actors-v10 = { package = "fil_builtin_actors_bundle", git = "https://github.com/filecoin-project/builtin-actors", branch = "next", features = ["m2-native"] }
 quarry-single-verify = { path = "tests/quarry-single-verify" }
 quarry-multi-verify = { path = "tests/quarry-multi-verify" }
+quarry-agg-single-verify = { path = "tests/quarry-agg-single-verify" }
 log = { version = "0.4.17" }
 colog = { version = "1.1.0" }
 

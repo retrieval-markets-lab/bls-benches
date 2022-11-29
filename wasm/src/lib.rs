@@ -1,7 +1,13 @@
+pub mod unsafe_verification;
+
+#[cfg(not(feature = "actor"))]
 use bls12_381::G2Projective;
+#[cfg(not(feature = "actor"))]
 use bls_signatures::*;
+#[cfg(not(feature = "actor"))]
 use rand::Rng;
 
+#[cfg(not(feature = "actor"))]
 pub fn make_sig(num: usize) -> (Signature, Vec<G2Projective>, Vec<PublicKey>) {
     let rng = &mut rand::thread_rng();
     // generate private keys
@@ -32,16 +38,3 @@ pub fn make_sig(num: usize) -> (Signature, Vec<G2Projective>, Vec<PublicKey>) {
 
     (aggregated_signature, hashes, public_keys)
 }
-
-macro_rules! verify_simd {
-    ($name:ident, $stuff:expr) => {
-        pub fn $name() {
-            verify(&$stuff.0, &$stuff.1, &$stuff.2);
-        }
-    };
-}
-
-verify_simd!(verify_1, make_sig(1));
-verify_simd!(verify_10, make_sig(10));
-verify_simd!(verify_100, make_sig(100));
-verify_simd!(verify_1000, make_sig(1000));

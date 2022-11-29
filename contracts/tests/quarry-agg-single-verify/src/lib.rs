@@ -3,9 +3,6 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 mod blockstore;
 use crate::blockstore::Blockstore;
-use bls_signatures::{
-    verify_messages, PublicKey as BlsPubKey, Serialize, Signature as BlsSignature,
-};
 use cid::multihash::Code;
 use cid::Cid;
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
@@ -15,6 +12,7 @@ use fvm_sdk::message::params_raw;
 use fvm_sdk::NO_DATA_BLOCK_ID;
 use fvm_shared::crypto::signature::Signature;
 use fvm_shared::ActorID;
+use bls_wasm::unsafe_verification::{g1_from_slice, g2_from_slice, aggregate_bls_verify};
 
 /// A macro to abort concisely.
 macro_rules! abort {
@@ -38,7 +36,7 @@ pub struct State {
 pub struct VerifyParams {
     pub aggregate_signature: Signature,
     pub pub_keys: Vec<Vec<u8>>,
-    pub data: Vec<Vec<u8>>,
+    pub data: Vec<u8>,
 }
 
 impl State {
@@ -129,15 +127,11 @@ pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
     state.count += 1;
     state.save();
 
-    // If the number of public keys and data does not match, then return false
-    if params.data.len() != params.pub_keys.len() {
-        abort!(USR_ILLEGAL_STATE, "pubkeys and data are wrong length");
-    }
     if params.data.is_empty() {
         abort!(USR_ILLEGAL_STATE, "data field is empty");
     }
 
-    let sig = match BlsSignature::from_bytes(params.aggregate_signature.bytes()) {
+    let sig = match g2_from_slice(params.aggregate_signature.bytes()) {
         Ok(v) => v,
         Err(err) => {
             abort!(USR_ILLEGAL_STATE, "invalid signature {:?}", err);
@@ -147,7 +141,7 @@ pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
     let pk_map_results: Result<Vec<_>, _> = params
         .pub_keys
         .iter()
-        .map(|x| BlsPubKey::from_bytes(x))
+        .map(|x| g1_from_slice(x))
         .collect();
 
     let pks = match pk_map_results {
@@ -156,11 +150,9 @@ pub fn verify_sig(params: VerifyParams) -> Option<RawBytes> {
             abort!(USR_ILLEGAL_STATE, "invalid pub key {:?}", err);
         }
     };
-
-    let data: Vec<&[u8]> = params.data.iter().map(|x| &**x).collect();
     // Does the aggregate verification
 
-    let verification = verify_messages(&sig, &data, &pks[..]);
+    let verification = aggregate_bls_verify(&sig, &params.data, &pks[..]);
 
     let ret = to_vec(format!("Call #{} ended with {:?}!", &state.count, verification).as_str());
     match ret {
