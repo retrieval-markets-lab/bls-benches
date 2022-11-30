@@ -1,18 +1,21 @@
-[package]
-name = "bls_bench"
-version = "0.1.0"
-edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+resolver = "2"
+members = [
+    "actors",
+    "bls-utils",
+    "bls-unsafe",
+]
 
-[dependencies]
-bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
-bls12_381 = "0.7.0"
-criterion = { version = "0.4", default-features = false }
-fvm-wasm-instrument = { git = "https://github.com/filecoin-project/fvm-wasm-instrument/" }
-rand = "0.8"
-wasm-bindgen = "0.2.83"
+[profile.actor]
+inherits = "release"
+panic = "abort"
+overflow-checks = true
+lto = true
+opt-level = "z"
+#strip = true
 
-[[bench]]
-name = "verify"
-harness = false
+[patch.crates-io]
+# temporary solution to funty@1.2.0 being yanked, we should propose bitvec upgrade to upstream filecoin crates
+# tracking issue: https://github.com/bitvecto-rs/funty/issues/7
+funty = { git = "https://github.com/bitvecto-rs/funty/", rev = "7ef0d890fbcd8b3def1635ac1a877fc298488446" }
