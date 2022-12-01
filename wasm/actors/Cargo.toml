@@ -51,13 +51,6 @@ pairing_lib = { version = "0.22.0", package = "pairing" }
 default = ["fvm/testing", "fvm_shared/testing"]
 
 
-
-
-[[bench]]
-name = "dummy"
-harness = false
-
-
 [[bench]]
 name = "agg_multi_verify"
 harness = false
