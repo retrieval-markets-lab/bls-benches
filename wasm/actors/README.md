@@ -6,7 +6,7 @@ We implement 3 custom actors here.
 ├── contracts/ 
     └── agg-multi-verify/ (aggregate signature verification with non-duplicate messages)
     └── agg-single-verify/ (aggregate signature verification with a single shared message)
-    └── single-verify/ (single signature verification)
+    └── single-verify/ (single signature verification using FVM syscall)
    
 ```
 
