@@ -2,7 +2,6 @@ use actor_utils::*;
 use bls_utils::make_sig_unsafe;
 use criterion::{criterion_group, criterion_main, Criterion};
 use fvm_integration_tests::tester::Account;
-use fvm_ipld_encoding::tuple::*;
 use fvm_ipld_encoding::RawBytes;
 use fvm_shared::crypto::signature::Signature;
 use pairing_lib::group::Curve;
@@ -14,17 +13,17 @@ macro_rules! bench_verify {
         fn $name(c: &mut Criterion) {
             setup_logs();
 
+            const MESSAGE_LEN: usize = 64;
+
+            let mut tester = new_tester();
+
+            let sender: [Account; 1] = tester.create_accounts().unwrap();
+
+            let (actor_address, mut executor) = setup_actor(tester, MULTI_SINGLE_MSG_VERIFY_BIN);
+
+            let mut i = 1;
+
             c.bench_function(&format!("agg_verify_unsafe {}", $num), |b| {
-                #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
-                struct State {
-                    count: usize,
-                }
-
-                let mut tester = new_tester();
-
-                const MESSAGE_LEN: usize = 64;
-                // we retain this so its roughly like for like in terms of (total) message size
-
                 let (aggregated_signature, data, public_keys) = make_sig_unsafe($num, MESSAGE_LEN);
 
                 let signature: Signature =
@@ -47,12 +46,6 @@ macro_rules! bench_verify {
                     }
                 };
 
-                let sender: [Account; 1] = tester.create_accounts().unwrap();
-
-                let (actor_address, mut executor) =
-                    setup_actor(tester, MULTI_SINGLE_MSG_VERIFY_BIN);
-
-                let mut i = 1;
                 b.iter(|| {
                     call_function(
                         &mut executor,

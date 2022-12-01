@@ -13,11 +13,17 @@ macro_rules! bench_single_verify {
         fn $name(c: &mut Criterion) {
             setup_logs();
 
-            c.bench_function(&format!("single_verify {}", $num), |b| {
-                let mut tester = new_tester();
-                // The number of signatures in aggregate
-                const NUM_SIGS: usize = 1;
+            // The number of signatures in aggregate
+            const NUM_SIGS: usize = 1;
+            let mut tester = new_tester();
 
+            let sender: [Account; 1] = tester.create_accounts().unwrap();
+
+            let (actor_address, mut executor) = setup_actor(tester, SINGLE_VERIFY_BIN);
+
+            let mut i = 1;
+
+            c.bench_function(&format!("single_verify {}", $num), |b| {
                 let (aggregated_signature, _, public_keys, data) =
                     bls_utils::make_sig_safe(NUM_SIGS, $num);
                 let public_key: &[u8] = &public_keys[0].as_bytes();
@@ -28,8 +34,6 @@ macro_rules! bench_single_verify {
                     }
                 };
                 let signature: Signature = Signature::new_bls(aggregated_signature.as_bytes());
-
-                let sender: [Account; 1] = tester.create_accounts().unwrap();
 
                 let params = VerifyParams {
                     signature: signature,
@@ -44,8 +48,6 @@ macro_rules! bench_single_verify {
                     }
                 };
 
-                let (actor_address, mut executor) = setup_actor(tester, SINGLE_VERIFY_BIN);
-                let mut i = 1;
                 b.iter(|| {
                     call_function(
                         &mut executor,

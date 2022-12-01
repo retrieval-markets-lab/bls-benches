@@ -11,11 +11,18 @@ macro_rules! bench_verify {
     ($name:ident, $num:expr) => {
         fn $name(c: &mut Criterion) {
             setup_logs();
+
+            const MESSAGE_LEN: usize = 64;
+
+            let mut tester = new_tester();
+
+            let sender: [Account; 1] = tester.create_accounts().unwrap();
+
+            let (actor_address, mut executor) = setup_actor(tester, MULTI_VERIFY_BIN);
+
+            let mut i = 1;
+
             c.bench_function(&format!("agg_verify_safe {}", $num), |b| {
-                let mut tester = new_tester();
-
-                const MESSAGE_LEN: usize = 64;
-
                 let (aggregated_signature, _, public_keys, data) =
                     bls_utils::make_sig_safe($num, MESSAGE_LEN);
                 let signature: Signature = Signature::new_bls(aggregated_signature.as_bytes());
@@ -33,11 +40,7 @@ macro_rules! bench_verify {
                         panic!("failed to serialize params {:?}", err);
                     }
                 };
-                let sender: [Account; 1] = tester.create_accounts().unwrap();
 
-                let (actor_address, mut executor) = setup_actor(tester, MULTI_VERIFY_BIN);
-
-                let mut i = 1;
                 b.iter(|| {
                     call_function(
                         &mut executor,
