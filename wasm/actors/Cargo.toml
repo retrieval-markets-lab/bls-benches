@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
-fvm = { version = "3.0.0-alpha.11", git = "https://github.com/filecoin-project/ref-fvm", default-features = false }
+fvm = { version = "3.0.0-alpha.12", git = "https://github.com/filecoin-project/ref-fvm", default-features = false }
 fvm_shared = { version = "3.0.0-alpha.12", git = "https://github.com/filecoin-project/ref-fvm", features = ["crypto"] }
 fvm_ipld_blockstore = { version = "0.1.1", git = "https://github.com/filecoin-project/ref-fvm" }
 fvm_integration_tests = { version = "0.1.1-alpha.1", git = "https://github.com/filecoin-project/ref-fvm" }
@@ -15,7 +15,7 @@ bls_utils = { package="bls_utils", path = "../bls-utils" }
 
 
 anyhow = "1.0.47"
-cid = { version = "0.8.5", default-features = false }
+cid = { version = "0.9.0", default-features = false, features = ["serde-codec"] }
 futures = "0.3.19"
 multihash = { version = "0.16.1", default-features = false }
 num-traits = "0.2"
