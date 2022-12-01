@@ -12,7 +12,7 @@ use fvm_shared::econ::TokenAmount;
 use fvm_shared::message::Message;
 use fvm_shared::state::StateTreeVersion;
 use fvm_shared::version::NetworkVersion;
-use log::debug;
+use log::info;
 use num_traits::Zero;
 use std::sync::Once;
 /// Setup function that is only run once, even if called multiple times.
@@ -104,7 +104,7 @@ pub fn call_function<E: Executor>(
     assert!(res.is_ok());
 
     let res = res.unwrap();
-    debug!(
+    info!(
         "Return data: {:?} | Gas used {:?} | Gas burned {:?}",
         res.msg_receipt.return_data.deserialize::<String>().unwrap(),
         res.msg_receipt.gas_used,

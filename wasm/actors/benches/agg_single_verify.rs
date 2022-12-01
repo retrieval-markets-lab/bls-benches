@@ -59,20 +59,22 @@ macro_rules! bench_verify {
         }
     };
 }
-
+bench_verify!(bench_verify_1, 1);
 bench_verify!(bench_verify_64, 64);
 bench_verify!(bench_verify_128, 128);
 bench_verify!(bench_verify_256, 256);
 bench_verify!(bench_verify_512, 512);
 bench_verify!(bench_verify_1024, 1024);
 
-criterion_group!(
-    benches,
-    bench_verify_64,
-    bench_verify_128,
-    bench_verify_256,
-    bench_verify_512,
-    bench_verify_1024
-);
+criterion_group! {
+    name = benches;
+    config = Criterion::default().significance_level(0.1).sample_size(10);
+    targets = bench_verify_1,
+        bench_verify_64,
+        bench_verify_128,
+        bench_verify_256,
+        bench_verify_512,
+        bench_verify_1024
+}
 
 criterion_main!(benches);
