@@ -5,7 +5,7 @@ use hkdf::Hkdf;
 use rand::Rng;
 use rand_core::{CryptoRng, RngCore};
 use sha2::{digest::generic_array::typenum::U48, digest::generic_array::GenericArray, Sha256};
-use bls_signatures::{verify};
+use bls_signatures::{verify, Signature, PublicKey};
 
 
 /// Generate a new private key.
@@ -131,7 +131,8 @@ pub fn make_sig_safe(
 
 
 #[no_mangle]
-pub extern "C" fn run_sig_verification(num: usize) -> bool {
-    let (aggregated_signature, hashes, public_keys, _) = make_sig_safe(num, 64);
+pub extern "C" fn run_sig_verification(
+    aggregated_signature: Signature, hashes: Vec<G2Projective>, public_keys: Vec<PublicKey>
+) -> bool {
     verify(&aggregated_signature, &hashes, &public_keys)
 }
