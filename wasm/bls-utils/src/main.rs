@@ -1,6 +1,7 @@
 
 use fvm_wasm_instrument::{
 	gas_metering,
+    inject_stack_limiter,
 	parity_wasm::{deserialize_buffer, serialize_to_file},
 };
 
@@ -9,8 +10,9 @@ use std::{
 	path::Path,
 };
 
+const STACK_LIMIT: u32  = 128;
 
-fn inject_gas() {
+fn inject_fvm_modules() {
     let path:&Path = Path::new("./fixtures/verify.wasm");
     println!("{}", path.display());
     let bytes: Vec<u8> = read(path).unwrap();
@@ -18,9 +20,11 @@ fn inject_gas() {
     let savepath = Path::new("./fixtures").join(format!("{file_name}-gas-metered.wasm"));
     let module = deserialize_buffer(&bytes).unwrap();
 
-    let gas_injected_module  = 
+    let mut injected_module  = 
         gas_metering::inject(module, &gas_metering::ConstantCostRules::default(), "env").unwrap();
-    let serialize_result = serialize_to_file(savepath, gas_injected_module);
+    injected_module = inject_stack_limiter(injected_module, STACK_LIMIT).unwrap();
+
+    let serialize_result = serialize_to_file(savepath, injected_module);
     let _serialize = match serialize_result {
         Ok(file) => file,
         Err(error) => panic!("Problem serializing module to wasm file: {:?}", error),
@@ -29,5 +33,5 @@ fn inject_gas() {
 }
 
 fn main () {
-    inject_gas()
+    inject_fvm_modules()
 }
