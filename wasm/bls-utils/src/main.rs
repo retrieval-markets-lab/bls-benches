@@ -1,6 +1,5 @@
-mod lib;
-
-use fvm_wasm_instrument::{
+ mod lib;
+ use fvm_wasm_instrument::{
 	gas_metering,
     inject_stack_limiter,
 	parity_wasm::{deserialize_buffer, serialize_to_file},
@@ -8,13 +7,16 @@ use fvm_wasm_instrument::{
 
 use std::{
 	fs::read,
-	path::Path,
+	path::Path, io::Read,
 };
 
-use lib::make_sig_safe;
+use lib::{make_sig_safe, run_sig_verification, VerifyParams};
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
 use fvm_ipld_encoding::{RawBytes};
-use bls_signatures::{Serialize as BlsSerialize};
+use bls_wasm_unsafe::{aggregate_bls_verify, g2_from_slice, g1_from_slice};
+
+use bls_signatures::{Signature as BlsSignature, Serialize as BlsSerialize, PublicKey, verify};
+use bls12_381::{G2Projective, G2Affine};
 use fvm_shared::crypto::{signature::Signature};
 use group::{GroupEncoding};
 
@@ -25,7 +27,7 @@ fn inject_fvm_modules() {
     println!("{}", path.display());
     let bytes: Vec<u8> = read(path).unwrap();
     let file_name = path.file_stem().unwrap().to_str().unwrap();    
-    let savepath = Path::new("./fixtures").join(format!("{file_name}-gas-metered.wasm"));
+    let savepath = Path::new("./fixtures").join(format!("{file_name}-fvm-injected.wasm"));
     let module = deserialize_buffer(&bytes).unwrap();
 
     let mut injected_module  = 
@@ -39,21 +41,8 @@ fn inject_fvm_modules() {
     };
 }
 
-
-#[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
-struct VerifyParams {
-    pub aggregate_signature: Vec<u8>,
-    pub pub_keys: Vec<Vec<u8>>,
-    pub hashes: Vec<Vec<u8>>,
-}
-
 fn main () {
-    #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
-    struct VerifyParams {
-        pub aggregate_signature: Signature,
-        pub pub_keys: Vec<Vec<u8>>,
-        pub hashes: Vec<Vec<u8>>,
-    }
+
     let (
         aggregated_signature, 
         hashes, 
@@ -70,16 +59,7 @@ fn main () {
         hashes: hash_vec
     };
 
-    // println!("{:?}", params);
-
     let params =  RawBytes::serialize(params).unwrap();
-    println!("{:?}", params.to_vec());
-
-    let params = match RawBytes::new(params.to_vec()).deserialize() {
-        Ok(p) => p,
-        Err(err) => {
-            panic!("Error: {:?}", err);
-        }
-    };
+    let res = run_sig_verification(params.bytes());
 
 }
