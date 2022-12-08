@@ -15,13 +15,15 @@ pairing_lib = { version = "0.22.0", package = "pairing" }
 getrandom = { version = "0.2", features = ["js"] }
 rand_core = { version = "0.6.0" }
 hkdf = { version = "0.11.0" }
+parity-wasm = "0.45.0"
+wasm-bindgen = "0.2.83"
 bls_wasm_unsafe = { path = "../bls-unsafe"}
 fvm-wasm-instrument = { git = "https://github.com/filecoin-project/fvm-wasm-instrument/" }
 fvm_ipld_encoding = { version = "0.3.0",  git = "https://github.com/filecoin-project/ref-fvm" }
 serde = { version = "1.0", features = ["derive"] }
 serde_tuple = "0.5"
 fvm_shared = "2.0.0"
-wasmer = "3.0.2"
+wasmer = { version="3.0.2"}
 group = "0.12.1"
 
 [lib]

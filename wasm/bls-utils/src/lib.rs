@@ -1,18 +1,18 @@
 use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
+use bls_signatures::{verify, PublicKey, Serialize, Signature};
 use bls_wasm_unsafe::Error;
 use hkdf::Hkdf;
 use rand::Rng;
 use rand_core::{CryptoRng, RngCore};
 use sha2::{digest::generic_array::typenum::U48, digest::generic_array::GenericArray, Sha256};
-use bls_signatures::{verify, Signature, PublicKey, Serialize};
-use wasmer::{Store, Module, Instance, Function, imports};
+use wasmer::{imports, Function, Instance, Module, Store};
 
+use bls_wasm_unsafe::{aggregate_bls_verify, g1_from_slice, g2_from_slice};
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
-use fvm_ipld_encoding::{RawBytes};
-use bls_wasm_unsafe::{aggregate_bls_verify, g2_from_slice, g1_from_slice};
-use fvm_shared::crypto::{signature::Signature as FvmSignature};
-use group::{GroupEncoding};
+use fvm_ipld_encoding::RawBytes;
+use fvm_shared::crypto::signature::Signature as FvmSignature;
+use group::GroupEncoding;
 
 /// Generate a new private key.
 pub fn generate_pk<R: RngCore + CryptoRng>(rng: &mut R) -> Scalar {
@@ -135,9 +135,7 @@ pub fn make_sig_safe(
     (aggregated_signature, hashes, public_keys, messages)
 }
 
-
-fn import_wasm_module () {
-
+fn import_wasm_module() {
     let module_wat = r#"
     (module
     (type $t0 (func (param i32) (result i32)))
@@ -150,12 +148,9 @@ fn import_wasm_module () {
     let mut store = Store::default();
     let module = Module::new(&store, &module_wat).unwrap();
     let import_object = imports! {};
-    let instance = Instance::new( &mut store, &module, &import_object).unwrap();
+    let instance = Instance::new(&mut store, &module, &import_object).unwrap();
     let add_one = instance.exports.get_function("add_one").unwrap();
-    
 }
-
-
 
 #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
 pub struct VerifyParams {
@@ -164,10 +159,8 @@ pub struct VerifyParams {
     pub hashes: Vec<Vec<u8>>,
 }
 
-
 #[no_mangle]
 pub extern "C" fn run_sig_verification(params: &[u8]) -> bool {
-
     let params = RawBytes::new(params.to_vec());
     let params = params.deserialize::<VerifyParams>().unwrap();
     let aggregated_signature = params.aggregate_signature;
@@ -177,8 +170,8 @@ pub extern "C" fn run_sig_verification(params: &[u8]) -> bool {
     let sig_slice = g2_from_slice(aggregated_signature.bytes()).unwrap();
     let aggregated_signature: Signature = Signature::from(sig_slice);
 
-    let hashes: Vec<G2Projective> = hashes.
-        iter()
+    let hashes: Vec<G2Projective> = hashes
+        .iter()
         .map(|hash_val| g2_from_slice(&hash_val).unwrap())
         .map(|hash_val| G2Projective::from(hash_val))
         .collect();
@@ -188,7 +181,6 @@ pub extern "C" fn run_sig_verification(params: &[u8]) -> bool {
         .map(|key| g1_from_slice(&key).unwrap())
         .map(|key| PublicKey::from(key))
         .collect();
-
 
     verify(&aggregated_signature, &hashes, &public_keys)
 }
