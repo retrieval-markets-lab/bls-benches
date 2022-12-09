@@ -5,6 +5,7 @@ members = [
     "actors",
     "bls-utils",
     "bls-unsafe",
+    "bls-tests"
 ]
 
 [profile.actor]
