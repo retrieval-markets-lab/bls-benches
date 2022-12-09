@@ -2,17 +2,15 @@ use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
 use bls_signatures::{verify, PublicKey, Serialize, Signature};
 use bls_wasm_unsafe::Error;
-use hkdf::Hkdf;
-use rand::Rng;
-use rand_core::{CryptoRng, RngCore};
-use sha2::{digest::generic_array::typenum::U48, digest::generic_array::GenericArray, Sha256};
-use wasmer::{imports, Function, Instance, Module, Store};
-
 use bls_wasm_unsafe::{aggregate_bls_verify, g1_from_slice, g2_from_slice};
 use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
 use fvm_ipld_encoding::RawBytes;
 use fvm_shared::crypto::signature::Signature as FvmSignature;
 use group::GroupEncoding;
+use hkdf::Hkdf;
+use rand::Rng;
+use rand_core::{CryptoRng, RngCore};
+use sha2::{digest::generic_array::typenum::U48, digest::generic_array::GenericArray, Sha256};
 
 /// Generate a new private key.
 pub fn generate_pk<R: RngCore + CryptoRng>(rng: &mut R) -> Scalar {
@@ -133,23 +131,6 @@ pub fn make_sig_safe(
     ));
 
     (aggregated_signature, hashes, public_keys, messages)
-}
-
-fn import_wasm_module() {
-    let module_wat = r#"
-    (module
-    (type $t0 (func (param i32) (result i32)))
-    (func $add_one (export "add_one") (type $t0) (param $p0 i32) (result i32)
-        get_local $p0
-        i32.const 1
-        i32.add))
-    "#;
-
-    let mut store = Store::default();
-    let module = Module::new(&store, &module_wat).unwrap();
-    let import_object = imports! {};
-    let instance = Instance::new(&mut store, &module, &import_object).unwrap();
-    let add_one = instance.exports.get_function("add_one").unwrap();
 }
 
 #[derive(Serialize_tuple, Deserialize_tuple, Clone, Debug)]
