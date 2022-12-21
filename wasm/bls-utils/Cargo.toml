@@ -5,25 +5,33 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+runtime = ["fp-bindgen-support"]
+wasi = ["wasmer/js"]
+
 [dependencies]
 bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
+wasmer = { version = "3", features= ["singlepass", "core"] }
+wasmer-wasi = "3"
 bls12_381 = { version = "=0.7.0", features = ["experimental"] }
 criterion = { version = "0.4", default-features = false  }
 rand = { version = "0.8" }
 sha2 = { version = "0.9"  }
 pairing_lib = { version = "0.22.0", package = "pairing" }
-getrandom = { version = "0.2", features = ["js"] }
 rand_core = { version = "0.6.0" }
 hkdf = { version = "0.11.0" }
 parity-wasm = "0.45.0"
-wasm-bindgen = "0.2.83"
+bindings = {path = "./rust-plugin"}
 bls_wasm_unsafe = { path = "../bls-unsafe"}
 fvm-wasm-instrument = { git = "https://github.com/filecoin-project/fvm-wasm-instrument/" }
 fvm_ipld_encoding = { version = "0.3.0",  git = "https://github.com/filecoin-project/ref-fvm" }
 serde = { version = "1.0", features = ["derive"] }
-serde_tuple = "0.5"
 fvm_shared = "2.0.0"
 group = "0.12.1"
+fp-bindgen-support = {git="https://github.com/fiberplane/fp-bindgen" , features = [
+  "async",
+  "host",
+], optional = true}
 
 [lib]
 crate-type = ["cdylib", "staticlib", "rlib"]

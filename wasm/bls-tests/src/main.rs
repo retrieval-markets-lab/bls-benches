@@ -65,8 +65,23 @@ fn test_wasm_bundle() {
     };
 
     let params = RawBytes::serialize(params).unwrap();
+    let test = params.bytes();
+    println!("{:?}", test);
 
-    let res = run_sig_verification(params.bytes());
+    let ty: Vec<_> = test
+        .iter()
+        .cloned()
+        .map(|num| Value::I32(num as i32))
+        .collect();
+    let tx: Vec<_> = ty
+        .iter()
+        .cloned()
+        .map(|num| num.unwrap_i32() as u8)
+        .collect();
+
+    println!("{:?}", tx);
+    // let tx = ty.iter().map(|num| *num)
+    // let res = run_sig_verification(params.bytes());
 }
 
 fn main() {

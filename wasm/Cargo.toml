@@ -5,6 +5,7 @@ members = [
     "actors",
     "bls-utils",
     "bls-unsafe",
+    "bindgen-protocol",
     "bls-tests"
 ]
 
