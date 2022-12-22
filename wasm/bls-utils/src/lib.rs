@@ -1,5 +1,3 @@
-mod spec;
-
 use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
 use bls_signatures::{verify, PublicKey, Serialize as BlsSer, Signature};

@@ -6,13 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-runtime = ["fp-bindgen-support"]
 wasi = ["wasmer/js"]
+runtime = [
+  "wasmer/singlepass",
+  "wasmer/sys",
+  "wasmer-wasi",
+  "fp-bindgen-support"
+]
 
 [dependencies]
 bls-signatures = { version = "0.13.0", default-features = false, features = ['pairing'] }
-wasmer = { version = "3", features= ["singlepass", "core"] }
-wasmer-wasi = "3"
+wasmer = { version = "3", default-features = false,  features= ["core"] }
+wasmer-wasi = { version = "3", optional = true}
 bls12_381 = { version = "=0.7.0", features = ["experimental"] }
 criterion = { version = "0.4", default-features = false  }
 rand = { version = "0.8" }
