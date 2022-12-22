@@ -3,18 +3,14 @@ use fp_bindgen_support::{
     common::{abi::WasmAbi, mem::FatPtr},
     host::{
         errors::{InvocationError, RuntimeError},
-        mem::{
-            deserialize_from_slice, export_to_guest, export_to_guest_raw, import_from_guest,
-            import_from_guest_raw, serialize_to_vec,
-        },
-        r#async::{create_future_value, future::ModuleRawFuture, resolve_async_value},
+        mem::{export_to_guest_raw,serialize_to_vec},
+        r#async::{resolve_async_value},
         runtime::RuntimeInstanceData,
     },
 };
 use std::sync::Arc;
 use wasmer::{
-    imports, AsStoreMut, Function, FunctionEnv, FunctionEnvMut, Imports, Instance, Module, 
-    Store, Singlepass
+    Function, FunctionEnv, FunctionEnvMut, Instance, Module, Store, Singlepass
 };
 
 pub struct Runtime {

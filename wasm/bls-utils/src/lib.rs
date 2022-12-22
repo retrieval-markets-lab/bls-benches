@@ -2,11 +2,7 @@ use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
 use bls_signatures::{verify, PublicKey, Serialize as BlsSer, Signature};
 use bls_wasm_unsafe::Error;
-use bls_wasm_unsafe::{aggregate_bls_verify, g1_from_slice, g2_from_slice};
-use fvm_ipld_encoding::tuple::{Deserialize_tuple, Serialize_tuple};
-use fvm_ipld_encoding::RawBytes;
-use fvm_shared::crypto::signature::Signature as FvmSignature;
-use group::GroupEncoding;
+use bls_wasm_unsafe::{g1_from_slice, g2_from_slice};
 use hkdf::Hkdf;
 use rand::Rng;
 use rand_core::{CryptoRng, RngCore};
@@ -134,34 +130,6 @@ pub fn make_sig_safe(
 
     (aggregated_signature, hashes, public_keys, messages)
 }
-
-// #[no_mangle]
-// pub extern "C" fn run_sig_verification(params: &[u8]) -> bool {
-//     let params = RawBytes::new(params.to_vec());
-//     let params = params.deserialize::<VerifyParams>().unwrap();
-//     let aggregated_signature = params.aggregate_signature;
-//     let hashes = params.hashes;
-//     let public_keys = params.pub_keys;
-
-//     let sig_slice = g2_from_slice(aggregated_signature.bytes()).unwrap();
-//     let aggregated_signature: Signature = Signature::from(sig_slice);
-
-//     let hashes: Vec<G2Projective> = hashes
-//         .iter()
-//         .map(|hash_val| g2_from_slice(&hash_val).unwrap())
-//         .map(|hash_val| G2Projective::from(hash_val))
-//         .collect();
-
-//     let public_keys: Vec<PublicKey> = public_keys
-//         .iter()
-//         .map(|key| g1_from_slice(&key).unwrap())
-//         .map(|key| PublicKey::from(key))
-//         .collect();
-
-//     verify(&aggregated_signature, &hashes, &public_keys)
-// }
-
-
 
 #[fp_export_impl(bindings)]
 fn run_sig_verification(params: VerifyParams) -> bool {

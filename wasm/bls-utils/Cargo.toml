@@ -29,7 +29,6 @@ parity-wasm = "0.45.0"
 bindings = {path = "./rust-plugin"}
 bls_wasm_unsafe = { path = "../bls-unsafe"}
 fvm-wasm-instrument = { git = "https://github.com/filecoin-project/fvm-wasm-instrument/" }
-fvm_ipld_encoding = { version = "0.3.0",  git = "https://github.com/filecoin-project/ref-fvm" }
 serde = { version = "1.0", features = ["derive"] }
 fvm_shared = "2.0.0"
 group = "0.12.1"
