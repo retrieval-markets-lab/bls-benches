@@ -6,7 +6,6 @@ members = [
     "bls-utils",
     "bls-unsafe",
     "bindgen-protocol",
-    "bls-tests"
 ]
 
 [profile.actor]
