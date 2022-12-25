@@ -50,3 +50,7 @@ harness = false
 [[bench]]
 name = "verify_unsafe"
 harness = false
+
+[[bench]]
+name = "wasm_verify"
+harness = false
