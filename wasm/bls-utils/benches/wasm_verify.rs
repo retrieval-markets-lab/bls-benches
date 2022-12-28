@@ -18,8 +18,8 @@ macro_rules! bench_verify {
                 let bytes = read(wasm_file).unwrap();
                 let mut runtime = Runtime::new(&bytes).unwrap();
             
-                let (aggregated_signature, hashes, public_keys, _) = make_sig_safe(1, 64);
-            
+                let (aggregated_signature, hashes, public_keys, _) = make_sig_safe($num, 64);
+    
                 let signature_bytes = aggregated_signature.as_bytes().to_vec();
                 let public_keys: Vec<_> = public_keys.iter().map(|x| x.as_bytes()).collect();
                 let hash_vec: Vec<_> = hashes
