@@ -1,0 +1,11 @@
+[package]
+name = "bindings"
+version = "1.0.0"
+authors = ["Alexander Dante Camuto dante@protocol.ai", "Amean Asad <amean.asad@protocol.ai>"]
+edition = "2018"
+
+[dependencies]
+fp-bindgen-support = { git = "https://github.com/fiberplane/fp-bindgen", version = "2.4.0", features = ["async", "guest"] }
+once_cell = { version = "1" }
+rmp-serde = { version = "1.0" }
+serde = { version = "1.0", features = ["derive"] }
