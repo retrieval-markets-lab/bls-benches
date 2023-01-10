@@ -1,3 +1,4 @@
+use bindings::{fp_export_impl, VerifyParams};
 use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
 use bls_signatures::{verify, PublicKey, Serialize as BlsSer, Signature};
@@ -7,8 +8,6 @@ use hkdf::Hkdf;
 use rand::Rng;
 use rand_core::{CryptoRng, RngCore};
 use sha2::{digest::generic_array::typenum::U48, digest::generic_array::GenericArray, Sha256};
-use bindings::{fp_export_impl, VerifyParams};
-
 
 /// Generate a new private key.
 pub fn generate_pk<R: RngCore + CryptoRng>(rng: &mut R) -> Scalar {
@@ -55,7 +54,7 @@ pub fn aggregate_unsafe(signatures: &[G2Affine]) -> Result<G2Affine, Error> {
     }
 
     let res = signatures
-        .into_iter()
+        .iter()
         .fold(G2Projective::identity(), |acc, signature| acc + signature);
 
     Ok(res.into())
@@ -141,13 +140,13 @@ fn run_sig_verification(params: VerifyParams) -> bool {
 
     let hashes: Vec<G2Projective> = hash_bytes
         .iter()
-        .map(|hash_val| g2_from_slice(&hash_val).unwrap())
+        .map(|hash_val| g2_from_slice(hash_val).unwrap())
         .map(|hash_val| G2Projective::from(hash_val))
         .collect();
 
     let public_keys: Vec<PublicKey> = pub_keys_bytes
         .iter()
-        .map(|key| g1_from_slice(&key).unwrap())
+        .map(|key| g1_from_slice(key).unwrap())
         .map(|key| PublicKey::from(key))
         .collect();
 

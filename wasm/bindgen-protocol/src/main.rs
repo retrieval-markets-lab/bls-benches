@@ -3,14 +3,14 @@ use once_cell::sync::Lazy;
 
 use std::collections::{BTreeMap, BTreeSet};
 const VERSION: &str = "1.0.0";
-const AUTHORS: &str = r#"["Alexander Dante Camuto dante@protocol.ai", "Amean Asad <amean.asad@protocol.ai>"]"#;
+const AUTHORS: &str =
+    r#"["Alexander Dante Camuto dante@protocol.ai", "Amean Asad <amean.asad@protocol.ai>"]"#;
 const NAME: &str = "bindings";
 
-
 static PLUGIN_DEPENDENCIES: Lazy<BTreeMap<&str, CargoDependency>> = Lazy::new(|| {
-/* fp-bindgen-support must be added here so we can pass the features we desire for the
-    rust-plugin generation.
-*/
+    /* fp-bindgen-support must be added here so we can pass the features we desire for the
+        rust-plugin generation.
+    */
     BTreeMap::from([(
         "fp-bindgen-support",
         CargoDependency {
@@ -20,7 +20,6 @@ static PLUGIN_DEPENDENCIES: Lazy<BTreeMap<&str, CargoDependency>> = Lazy::new(||
         },
     )])
 });
-
 
 #[derive(Serializable)]
 pub struct VerifyParams {

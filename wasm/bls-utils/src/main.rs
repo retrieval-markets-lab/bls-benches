@@ -1,18 +1,16 @@
-#[cfg(feature="runtime")]
+#[cfg(feature = "runtime")]
 mod runtime;
 
-#[cfg(feature="runtime")]
-use runtime::{
-    runtime::run_wasm_module,
-    fvm_injection::inject_fvm_modules,
-};
+#[cfg(feature = "runtime")]
+use runtime::{fvm_injection::inject_fvm_modules, module::run_wasm_module};
+
+use std::path::Path;
 
 fn main() {
-   
-    #[cfg(feature="runtime")]
-    inject_fvm_modules();
-    #[cfg(feature="runtime")]
-    run_wasm_module();
+    let file_path = Path::new("./wasm-files/bls_utils.wasm");
+    let module_path = Path::new("./wasm-files/bls_utils_fvm_injected.wasm");
+    #[cfg(feature = "runtime")]
+    inject_fvm_modules(file_path);
+    #[cfg(feature = "runtime")]
+    run_wasm_module(module_path);
 }
-
-

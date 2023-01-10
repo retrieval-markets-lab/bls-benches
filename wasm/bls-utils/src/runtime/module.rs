@@ -1,16 +1,15 @@
-#[path = "../spec/mod.rs"] mod spec;
+#[path = "../spec/mod.rs"]
+mod spec;
 
+use bls_signatures::Serialize;
+use bls_utils::make_sig_safe;
+use group::GroupEncoding;
 use spec::{bindings::Runtime, types::VerifyParams};
 use std::{fs::read, path::Path};
-use bls_signatures::Serialize;
-use group::GroupEncoding;
-use bls_utils::{make_sig_safe};
 
-
-pub fn run_wasm_module() {
-    let wasm_file = Path::new("./wasm-files/bls_utils.wasm");
-    let bytes = read(wasm_file).unwrap();
-    let mut runtime = Runtime::new(&bytes).unwrap();
+pub fn run_wasm_module(path: &Path) {
+    let bytes = read(path).unwrap();
+    let mut runtime = Runtime::new(bytes).unwrap();
 
     let (aggregated_signature, hashes, public_keys, _) = make_sig_safe(1, 64);
 
@@ -30,4 +29,3 @@ pub fn run_wasm_module() {
     let res = runtime.run_sig_verification(params);
     println!("{:?}", res)
 }
-
