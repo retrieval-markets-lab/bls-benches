@@ -16,6 +16,7 @@ bls-benches/
     ├── bindgen-protocol / (bindings generator for wasm modules) 
     ├── bls-utils/ (benchmarks running bls in wasm)
     |   └── benches/ (library benchmarks and tests)
+    |   └── wasm-plugin/ (generated plugin to define param bindings for functions)
     |   └── src/ (utility functions)
     └── bls-unsafe/ (unsafe implementation of bls)
         └── src/ (single message aggregate signing)
