@@ -1,6 +1,9 @@
+use bindings::{fp_export_impl, VerifyParams};
 use bls12_381::{hash_to_curve::HashToField, Scalar};
 use bls12_381::{G1Projective, G2Affine, G2Projective};
+use bls_signatures::{verify, PublicKey, Serialize as BlsSer, Signature};
 use bls_wasm_unsafe::Error;
+use bls_wasm_unsafe::{g1_from_slice, g2_from_slice};
 use hkdf::Hkdf;
 use rand::Rng;
 use rand_core::{CryptoRng, RngCore};
@@ -51,7 +54,7 @@ pub fn aggregate_unsafe(signatures: &[G2Affine]) -> Result<G2Affine, Error> {
     }
 
     let res = signatures
-        .into_iter()
+        .iter()
         .fold(G2Projective::identity(), |acc, signature| acc + signature);
 
     Ok(res.into())
@@ -125,4 +128,27 @@ pub fn make_sig_safe(
     ));
 
     (aggregated_signature, hashes, public_keys, messages)
+}
+
+#[fp_export_impl(bindings)]
+fn run_sig_verification(params: VerifyParams) -> bool {
+    let sig_bytes = params.aggregate_signature;
+    let hash_bytes = params.hashes;
+    let pub_keys_bytes = params.pub_keys;
+
+    let aggregated_signature = Signature::from_bytes(&sig_bytes).unwrap();
+
+    let hashes: Vec<G2Projective> = hash_bytes
+        .iter()
+        .map(|hash_val| g2_from_slice(hash_val).unwrap())
+        .map(|hash_val| G2Projective::from(hash_val))
+        .collect();
+
+    let public_keys: Vec<PublicKey> = pub_keys_bytes
+        .iter()
+        .map(|key| g1_from_slice(key).unwrap())
+        .map(|key| PublicKey::from(key))
+        .collect();
+
+    verify(&aggregated_signature, &hashes, &public_keys)
 }

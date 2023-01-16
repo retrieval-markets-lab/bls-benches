@@ -14,9 +14,10 @@ bls-benches/
 └── wasm/ (experiments for BLS verification in wasm envs)
     ├── actors/ (custom Filecoin actors for bls verification)
     |   └── tests/ (tests of custom actors within FVM)
-    |
+    ├── bindgen-protocol / (bindings generator for wasm modules) 
     ├── bls-utils/ (benchmarks running bls in wasm)
-    |   ├── benches/ (library benchmarks and tests)
+    |   └── benches/ (library benchmarks and tests)
+    |   └── wasm-plugin/ (generated plugin to define param bindings for functions)
     |   └── src/ (utility functions)
     |
     └── bls-unsafe/ (unsafe implementation of bls)
